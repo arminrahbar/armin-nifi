@@ -522,20 +522,6 @@ public class TestValidateRecord {
         final MockFlowFile validFlowFile = runner.getFlowFilesForRelationship(ValidateRecord.REL_VALID).get(0);
         validFlowFile.assertContentEquals(new File("src/test/resources/TestValidateRecord/timestamp.json"));
 
-        // Test with a timestamp that has an invalid format.
-        runner.clearTransferState();
-
-        runner.disableControllerService(jsonReader);
-        runner.setProperty(jsonReader, DateTimeUtils.TIMESTAMP_FORMAT, "yyyy-MM-dd HH:mm:ss");
-        runner.enqueue(Paths.get("src/test/resources/TestValidateRecord/timestamp.json"));
-        runner.enableControllerService(jsonReader);
-
-        runner.run();
-
-        runner.assertTransferCount(ValidateRecord.REL_INVALID, 1);
-        final MockFlowFile invalidFlowFile = runner.getFlowFilesForRelationship(ValidateRecord.REL_INVALID).get(0);
-        invalidFlowFile.assertContentEquals(new File("src/test/resources/TestValidateRecord/timestamp.json"));
-
         // Test with an Inferred Schema.
         runner.disableControllerService(jsonReader);
         runner.setProperty(jsonReader, SchemaAccessUtils.SCHEMA_ACCESS_STRATEGY, SchemaInferenceUtil.INFER_SCHEMA.getValue());
@@ -549,6 +535,20 @@ public class TestValidateRecord {
         runner.assertTransferCount(ValidateRecord.REL_VALID, 1);
         final MockFlowFile validFlowFileInferredSchema = runner.getFlowFilesForRelationship(ValidateRecord.REL_VALID).get(0);
         validFlowFileInferredSchema.assertContentEquals(new File("src/test/resources/TestValidateRecord/timestamp.json"));
+        
+        // Test with a timestamp that has an invalid format.
+        runner.clearTransferState();
+
+        runner.disableControllerService(jsonReader);
+        runner.setProperty(jsonReader, DateTimeUtils.TIMESTAMP_FORMAT, "yyyy-MM-dd HH:mm:ss");
+        runner.enqueue(Paths.get("src/test/resources/TestValidateRecord/timestamp.json"));
+        runner.enableControllerService(jsonReader);
+
+        runner.run();
+
+        runner.assertTransferCount(ValidateRecord.REL_INVALID, 1);
+        final MockFlowFile invalidFlowFile = runner.getFlowFilesForRelationship(ValidateRecord.REL_INVALID).get(0);
+        invalidFlowFile.assertContentEquals(new File("src/test/resources/TestValidateRecord/timestamp.json"));
     }
 
     @Test
